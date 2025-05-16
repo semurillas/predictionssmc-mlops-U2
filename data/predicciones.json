@@ -1,0 +1,54 @@
+[
+  {
+    "resultado": "ENFERMEDAD TERMINAL",
+    "fecha": "2025-05-16T04:48:17.466156"
+  },
+  {
+    "resultado": "ENFERMEDAD TERMINAL",
+    "fecha": "2025-05-16T04:48:20.448563"
+  },
+  {
+    "resultado": "ENFERMEDAD LEVE",
+    "fecha": "2025-05-16T04:48:22.917912"
+  },
+  {
+    "resultado": "ENFERMEDAD LEVE",
+    "fecha": "2025-05-16T04:48:26.962511"
+  },
+  {
+    "resultado": "ENFERMEDAD LEVE",
+    "fecha": "2025-05-16T04:48:29.045575"
+  },
+  {
+    "resultado": "ENFERMEDAD AGUDA",
+    "fecha": "2025-05-16T04:48:31.288628"
+  },
+  {
+    "resultado": "NO ENFERMO",
+    "fecha": "2025-05-16T04:48:43.976493"
+  },
+  {
+    "resultado": "ENFERMEDAD TERMINAL",
+    "fecha": "2025-05-16T04:52:49.445903"
+  },
+  {
+    "resultado": "ENFERMEDAD CR\u00d3NICA",
+    "fecha": "2025-05-16T04:52:53.303880"
+  },
+  {
+    "resultado": "NO ENFERMO",
+    "fecha": "2025-05-16T04:53:01.641113"
+  },
+  {
+    "resultado": "ENFERMEDAD AGUDA",
+    "fecha": "2025-05-16T04:53:06.818432"
+  },
+  {
+    "resultado": "ENFERMEDAD AGUDA",
+    "fecha": "2025-05-16T04:53:13.440882"
+  },
+  {
+    "resultado": "ENFERMEDAD CR\u00d3NICA",
+    "fecha": "2025-05-16T04:53:15.275444"
+  }
+]
