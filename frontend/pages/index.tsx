@@ -11,6 +11,18 @@ export default function Home() {
   const [orinaOscura, setOrinaOscura] = useState(false);
   const [hecesPalidas, setHecesPalidas] = useState(false);
   const [resultado, setResultado] = useState("");
+  const [reporte, setReporte] = useState<Reporte | null>(null);
+
+  type Prediccion = {
+    resultado: string;
+    fecha: string;
+  };
+  
+  type Reporte = {
+    total_por_categoria: { [key: string]: number };
+    ultimas_5: Prediccion[];
+    fecha_ultima_prediccion: string;
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -40,6 +52,14 @@ export default function Home() {
     setResultado(data.resultado);
   };
 
+
+  const handleReporte = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reporte`);
+    const data = await res.json();
+    setReporte(data);
+  };
+
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -47,15 +67,18 @@ export default function Home() {
       alignItems: "center",
       justifyContent: "center",
       fontFamily: "Arial, sans-serif",
-      backgroundColor: "#f5f5f5"
+      backgroundColor: "#f5f5f5",
+      padding: "40px"
     }}>
+      <div style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}></div>
+
+
       <div style={{
         backgroundColor: "#fff",
-        padding: "40px",
+        padding: "30px",
         borderRadius: "10px",
         boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        width: "100%",
-        maxWidth: "500px"
+        width: "400px"
       }}>
         <h2 style={{ textAlign: "center", color: "#000" }}>Formulario de Evaluación de Severidad Clínica</h2>
         <form onSubmit={handleSubmit}>
@@ -99,8 +122,41 @@ export default function Home() {
             Resultado: {resultado}
           </div>
         )}
+
+        <button onClick={handleReporte} style={{ ...buttonStyle, marginTop: "20px", backgroundColor: "#555" }}>
+            Ver reporte
+        </button>
       </div>
-    </div>
+      
+      {/* Reporte */}
+      {reporte && (
+          <div style={{
+            backgroundColor: "#fefefe",
+            padding: "20px",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            width: "350px"
+          }}>
+            <h3>📊 Reporte de predicciones</h3>
+            <p><strong>Fecha última predicción:</strong><br />{reporte.fecha_ultima_prediccion || "Sin datos"}</p>
+
+            <p><strong>Totales por categoría:</strong></p>
+            <ul style={{ color: "#000" }}>
+              {Object.entries(reporte.total_por_categoria).map(([categoria, total]) => (
+                <li key={categoria}>{categoria}: {total}</li>
+              ))}
+            </ul>
+
+            <p><strong>Últimas 5 predicciones:</strong></p>
+            <ul style={{ color: "#000" }}>
+              {reporte.ultimas_5.map((pred: any, index: number) => (
+                <li key={index}>{pred.resultado} ({new Date(pred.fecha).toLocaleString()})</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
   );
 }
 

@@ -1,20 +1,22 @@
 from typing import Union
-
 from fastapi import FastAPI
-
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
+import os
+import json
 
 app = FastAPI()
 
-# Permitir CORS desde el frontend (Next.js)
-#app.add_middleware(
- #   CORSMiddleware,
-  #  allow_origins=["http://localhost:3000"],  # frontend local
-   # allow_methods=["*"],
-    #allow_headers=["*"],
-#)
+# Ruta del archivo persistente
+ruta_archivo = "data/predicciones.json"
 
+# Crear directorio y archivo si no existen
+if not os.path.exists("data"):
+    os.makedirs("data")
+if not os.path.exists(ruta_archivo):
+    with open(ruta_archivo, "w") as f:
+        json.dump([], f)
 
 
 app.add_middleware(
@@ -70,4 +72,41 @@ def predict(data: InputData):
     else:
         resultado = "NO ENFERMO"
 
+
+
+    nueva_prediccion = {
+        "resultado": resultado,
+        "fecha": datetime.now().isoformat()
+    }
+
+    with open(ruta_archivo, "r+") as f:
+        predicciones = json.load(f)
+        predicciones.append(nueva_prediccion)
+        f.seek(0)
+        json.dump(predicciones, f, indent=2)
+
+
     return {"resultado": resultado}
+
+
+#endpoint generacion reporte
+@app.get("/reporte")
+def reporte():
+    if not os.path.exists(ruta_archivo):
+        return {"mensaje": "No hay predicciones registradas aún."}
+
+    with open(ruta_archivo, "r") as f:
+        predicciones = json.load(f)
+
+    total_por_categoria = {}
+    for pred in predicciones:
+        total_por_categoria[pred["resultado"]] = total_por_categoria.get(pred["resultado"], 0) + 1
+
+    ultimas_5 = predicciones[-5:][::-1]
+    ultima_fecha = predicciones[-1]["fecha"] if predicciones else None
+
+    return {
+        "total_por_categoria": total_por_categoria,
+        "ultimas_5": ultimas_5,
+        "fecha_ultima_prediccion": ultima_fecha
+    }
