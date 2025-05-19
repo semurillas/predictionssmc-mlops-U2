@@ -1,0 +1,43 @@
+name: CI/CD Pull Request Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Comentar el pull request
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            CI/CD en acción. Ejecutando tareas …
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Instalar dependencias del backend
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Ejecutar pruebas
+        run: |
+          cd backend
+          pytest tests/
+
+      - name: Comentar el pull request terminado
+        if: success()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            CI/CD terminado con exito.
