@@ -1,0 +1,42 @@
+name: CI/CD Main Branch Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Instalar dependencias
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Ejecutar pruebas
+        run: |
+          cd backend
+          PYTHONPATH=. pytest test/
+
+      - name: Login a GitHub Container Registry (GHCR)
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construir y publicar imagen Docker
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/mlops-backend:latest ./backend
+          docker push ghcr.io/${{ github.repository }}/mlops-backend:latest
