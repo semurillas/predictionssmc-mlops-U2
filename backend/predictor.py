@@ -21,9 +21,12 @@ def evaluar_prediccion(edad, peso, sintomas: dict) -> str:
         return "ENFERMEDAD LEVE"
     elif sintomas_moderados >= 2 and sintomas_graves == 1:
         return "ENFERMEDAD AGUDA"
-    elif sintomas_graves >= 2 or (edad >= 65 and sintomas_moderados >= 2):
-        return "ENFERMEDAD CRÓNICA"
     elif sintomas_graves == 3 or (sintomas.get("confusion") and edad >= 70 and peso < 50):
         return "ENFERMEDAD TERMINAL"
+    elif sintomas_graves >= 2 or (edad >= 65 and sintomas_moderados >= 2):
+        return "ENFERMEDAD CRÓNICA"
     else:
         return "NO ENFERMO"
+    
+
+    
