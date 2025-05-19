@@ -1,3 +1,4 @@
+# Funcion prueba
 def evaluar_prediccion(edad, peso, sintomas: dict) -> str:
     sintomas_graves = sum([
         sintomas.get("ictericia", False),
