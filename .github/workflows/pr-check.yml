@@ -33,7 +33,7 @@ jobs:
       - name: Ejecutar pruebas
         run: |
           cd backend
-          pytest tests/
+          pytest test/
 
       - name: Comentar el pull request terminado
         if: success()

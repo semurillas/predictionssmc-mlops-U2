@@ -27,7 +27,7 @@ jobs:
       - name: Ejecutar pruebas
         run: |
           cd backend
-          pytest tests/
+          pytest test/
 
       - name: Login a GitHub Container Registry (GHCR)
         uses: docker/login-action@v2
