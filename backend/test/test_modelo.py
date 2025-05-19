@@ -1,5 +1,5 @@
 from predictor import evaluar_prediccion
-
+#test enfermedad leve
 def test_prediccion_leve():
     resultado = evaluar_prediccion(30, 70, {
         "ictericia": False,
@@ -11,7 +11,7 @@ def test_prediccion_leve():
         "heces_palidas": False
     })
     assert resultado == "ENFERMEDAD LEVE"
-
+# test enfermedad terminal
 def test_prediccion_terminal():
     resultado = evaluar_prediccion(75, 45, {
         "ictericia": True,
