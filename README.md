@@ -1,78 +1,125 @@
-HEAD
-# 🩺 Proyecto MLOps – Predicción de Enfermedades
 
-## 📦 Nombre del proyecto: `predictionsmlops`
+# Reestructuración del Pipeline MLOps para Predicción de Enfermedades
 
----
+## Etapa de Diseño: Entrada y Preparación de Datos
 
-## 🧠 Descripción
+La etapa de diseño define los fundamentos sobre los cuales se construye la solución, priorizando la calidad de los datos, la seguridad y la preparación adecuada antes de alimentar el modelo de predicción.
 
-Este repositorio contiene un proyecto de Machine Learning orientado a la predicción del estado de salud de pacientes, a partir de síntomas básicos registrados. La aplicación evalúa los datos de entrada y retorna un diagnóstico estimado, clasificado en uno de los siguientes cinco niveles de severidad:
+### Restricciones y características de los datos
 
-- **NO ENFERMO**
-- **ENFERMEDAD LEVE**
-- **ENFERMEDAD AGUDA**
-- **ENFERMEDAD CRÓNICA**
-- **ENFERMEDAD TERMINAL**
+Dado que se trata de datos médicos, se deben tener en cuenta las siguientes limitaciones:
 
-El objetivo del proyecto es ofrecer una solución sencilla, escalable y modular, que sirva como base para construir un pipeline completo de MLOps que permita integrar entrenamiento, pruebas automáticas, despliegue continuo y monitoreo del modelo.
+- **Datos desbalanceados**: la mayoría de los registros estarán asociados a enfermedades comunes, mientras que las enfermedades huérfanas estarán representadas en cantidades mínimas. Esto puede sesgar el aprendizaje del modelo.
+- **Datos sensibles**: los datos personales y clínicos deben ser tratados con confidencialidad, por lo cual se aplicarán estrategias de anonimización y se garantizará la transmisión mediante protocolos seguros como HTTPS.
+- **Presencia de datos nulos o mal etiquetados**: es común encontrar síntomas faltantes o inconsistentes en los registros. Esto requiere un proceso de validación riguroso, complementado con imputación estadística o revisión de expertos.
 
----
+### Tipos de datos a considerar
 
-## ⚙️ Tecnologías utilizadas
+- **Estructurados**: campos como edad, peso y síntomas codificados binariamente (presencia/ausencia).
+- **No estructurados (en etapas futuras)**: comentarios clínicos o notas médicas en texto libre, que pueden enriquecer el análisis mediante NLP.
 
-- **Frontend**: [Next.js](https://nextjs.org/)
-  - Framework moderno para interfaces gráficas rápidas, reactivas y modulares.
-- **Backend / API**: [FastAPI](https://fastapi.tiangolo.com/)
-  - Framework de alto rendimiento en Python para la construcción de APIs RESTful.
-- **Modelo de ML**: Python (estructura de predicción basada en rangos)
-- **Contenerización**: [Docker](https://www.docker.com/)
-  - Permite ejecutar tanto el backend como el frontend en contenedores independientes, facilitando el despliegue y la portabilidad.
+### Acciones de preprocesamiento y definición de estructura
 
----
+- **Validación de datos nulos**: se establecen reglas clínicas para definir si una entrada incompleta puede ser completada (mediante imputación por moda o media) o descartada. La intervención de expertos es clave en casos críticos.
 
-## 🚀 Objetivo técnico
+- **Tratamiento y transformación de datos**:
+  - **Codificación**: los síntomas se representan con One-Hot Encoding.
+  - **Imputación**: síntomas ausentes o mal registrados se corrigen.
+  - **Embeddings (opcional)**: si se incorporan características categóricas complejas o textuales, se usarán embeddings.
 
-Este proyecto busca consolidarse como una base funcional para construir un pipeline de MLOps completo, incorporando gradualmente:
+- **Tratamiento del desbalance de clases**:
+  - Se aplicará SMOTE o ADASYN.
+  - Se considerará transfer learning con datasets externos más completos.
 
-- **Pruebas unitarias**
-- **Integración continua (CI)**
-- **Entrega continua (CD)**
-- **Versionado de modelos y control de datos**
-- **Monitoreo de rendimiento**
+- **Definición de la estructura de datos final**:
+  - Se estandariza en un formato tabular validado con `pydantic` o `jsonschema`.
 
----
+### Infraestructura de almacenamiento
 
-## 📁 Estructura general del proyecto
+- **Amazon S3** para datos brutos.
+- **Amazon Redshift** para datos transformados.
+- **DVC** para versionado de datasets.
 
-```plaintext
-📦 predictionsmlops/
-├── backend/                    # Código del modelo y la API FastAPI
-│   ├── app/
-│   └── Dockerfile
-├── frontend/                   # Interfaz de usuario con Next.js
-│   └── Dockerfile
-├── docker-compose.yml          # Orquestación de contenedores
-├── README.md
-└── requirements.txt
+### Justificación de tecnologías
 
-## 🐳 Cómo desplegar el proyecto con Docker
+- **pandas**: manipulación y análisis exploratorio.
+- **FastAPI + pydantic**: validación eficiente y esquema de entrada.
+- **imblearn**: técnicas de balanceo como SMOTE.
+- **DVC**: reproducibilidad y trazabilidad.
+- **S3 + Redshift**: almacenamiento escalable y eficiente.
 
-### ✅ Requisitos previos
+## Etapa de Desarrollo: Ingesta, Modelado y Evaluación
 
-- Tener instalado [Docker](https://www.docker.com/products/docker-desktop)
-- Tener instalado [Docker Compose](https://docs.docker.com/compose/) si tu versión de Docker no lo trae incluido
+### 3.1 Ingesta de datos y almacenamiento
 
----
+- **Fuentes internas**: registros clínicos estructurados.
+- **Fuentes externas**: datasets de enfermedades raras.
+- Almacenamiento en **S3** y transformación final en **Redshift**.
+- **DVC** asegura trazabilidad y reproducibilidad.
 
-### 🚀 Despliegue con un solo comando
+### 3.2 Análisis exploratorio y Feature Engineering
 
-Desde la raíz del proyecto, ejecuta:
+- Herramientas: **pandas**, **seaborn**, **Jupyter Notebooks**.
+- Detección de valores atípicos, correlaciones, inconsistencias.
+- Transformaciones, interacciones, PCA (si aplica).
 
-```bash
-docker-compose up --build
+### 3.3 Entrenamiento del modelo
 
+- Modelos: **Random Forest**, **XGBoost**.
+- Validación: **k-fold cross-validation**, tuning con **GridSearchCV** o **Optuna**.
 
-### Para detener la aplicacion ejecuta:
+### 3.4 Evaluación y comparación
 
-docker-compose down
+- Métricas: **ROC AUC**, **F1-score**, **matriz de confusión**, tiempo de inferencia, uso de memoria.
+- Validación clínica por expertos.
+
+### 3.5 Visualización y documentación
+
+- Herramientas: **Streamlit**, **matplotlib**.
+- Opcional: **MLflow**, **Tableau**.
+
+### 3.6 Validación técnica y ciclo iterativo
+
+- Validación funcional y técnica.
+- Iteración con nuevos datos o ajustes si no cumple con criterios establecidos.
+
+## Etapa de Producción
+
+### 4.1 Despliegue del modelo
+
+- **Docker + FastAPI** para empaquetado y exposición como API.
+- Servidores: **Uvicorn** local o servicios como **Render**, **EC2**, **Railway**.
+- Orquestación: **Docker Compose**, **Kubernetes**.
+
+### 4.2 Generación de predicciones
+
+- Predicciones almacenadas en archivos `.json` o `.txt`.
+- Endpoint `/reporte` expone conteos, últimas predicciones y fecha.
+
+### 4.3 Monitoreo del sistema
+
+- Infraestructura: **Prometheus + Grafana**.
+- Modelo: evaluación diaria de métricas clave, detección de `data drift`.
+
+### 4.4 Reentrenamiento automático
+
+- Nuevos datos en S3.
+- Orquestación del retrain con **Apache Airflow**.
+- Evaluación comparativa, promoción automática si supera umbrales.
+
+### 4.5 Tecnologías empleadas
+
+- **FastAPI**, **Docker**, **Kubernetes**, **Prometheus**, **Grafana**, **Airflow**, **S3**, **Redshift**.
+
+## CHANGELOG
+
+| Cambio                  | Propuesta Original     | Propuesta Actual                                       |
+|------------------------|------------------------|--------------------------------------------------------|
+| Almacenamiento de datos| No especificado        | S3 para datasets, Redshift para estructurados          |
+| Tecnologías por etapa  | Mencionadas superficialmente | Justificadas y detalladas                      |
+| Métricas de validación | No definidas           | ROC AUC, F1-score, matriz de confusión                |
+| Escenarios de ejecución| Solo nube              | Nube o local según recursos del médico                 |
+| Monitoreo del modelo   | No presente            | Monitoreo activo con Prometheus + reentrenamiento     |
+| Validación de calidad  | Implícita              | Umbrales definidos + pruebas unitarias                |
+| Iteración de modelos   | No contemplada         | Flujo iterativo documentado                           |
+| Ingesta de nuevos datos| Manual o ausente       | Automatizada con Airflow                              |
